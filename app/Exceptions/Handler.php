@@ -3,6 +3,8 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -37,6 +39,28 @@ class Handler extends ExceptionHandler
     public function report(Throwable $exception)
     {
         parent::report($exception);
+    }
+
+    /**
+     *  override the invalidJson method in the parent ExceptionHandler class
+     */
+    protected function invalidJson($request, ValidationException $exception)
+    {
+        $errors = (new Collection($exception->validator->errors()))
+            ->map(function ($error, $key) {
+                return [
+                    'title' => 'Validation Error',
+                    'details' => $error[0],
+                    'source' => [
+                        'pointer' => '/' . str_replace('.', '/', $key),
+                    ]
+                ];
+            })
+            ->values();
+
+        return response()->json([
+            'errors' => $errors,
+        ], $exception->status);
     }
 
     /**
