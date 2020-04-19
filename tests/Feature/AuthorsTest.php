@@ -19,16 +19,14 @@ class AuthorsTest extends TestCase
      */
     public function it_returns_an_author_as_a_resource_object()
     {
-        $author = factory(Author::class)->create([
-            'first_name' => 'John',
-            'last_name' => 'Doe',
-            'other_name' => 'Jonny',
-        ]);
-
+        $author = factory(Author::class)->create();
         $user = factory(User::class)->create();
         Passport::actingAs($user);
 
-        $this->getJson('/api/v1/authors/1')
+        $this->getJson('/api/v1/authors/1', [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
+        ])
             ->assertStatus(200)
             ->assertJson([
                 "data" => [
@@ -55,7 +53,10 @@ class AuthorsTest extends TestCase
         Passport::actingAs($user);
         $authors = factory(Author::class, 3)->create();
 
-        $this->getJson('/api/v1/authors')
+        $this->getJson('/api/v1/authors', [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
+        ])
             ->assertStatus(200)
             ->assertJson([
                 "data" => [
@@ -104,16 +105,23 @@ class AuthorsTest extends TestCase
         $user = factory(User::class)->create();
         Passport::actingAs($user);
 
-        $this->postJson('/api/v1/authors', [
-            'data' => [
-                'type' => 'authors',
-                'attributes' => [
-                    'first_name' => 'John',
-                    'last_name' => 'Doe',
-                    'other_name' => 'Jonny',
+        $this->postJson(
+            '/api/v1/authors',
+            [
+                'data' => [
+                    'type' => 'authors',
+                    'attributes' => [
+                        'first_name' => 'John',
+                        'last_name' => 'Doe',
+                        'other_name' => 'Jonny',
+                    ]
                 ]
+            ],
+            [
+                'accept' => 'application/vnd.api+json',
+                'content-type' => 'application/vnd.api+json',
             ]
-        ])
+        )
             ->assertStatus(201)
             ->assertJson([
                 "data" => [
@@ -155,6 +163,9 @@ class AuthorsTest extends TestCase
                     'other_name' => 'Jonny',
                 ]
             ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
         ])
             ->assertStatus(422)
             ->assertJson([
@@ -195,6 +206,9 @@ class AuthorsTest extends TestCase
                     'other_name' => 'Jonny',
                 ]
             ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
         ])
             ->assertStatus(422)
             ->assertJson([
@@ -221,7 +235,7 @@ class AuthorsTest extends TestCase
      * @test
      */
     public function
-    it_validates_that_the_attributes_member_has_been_given_when_creating_an_author()
+    it_validates_that_the_attributes_members_has_been_given_when_creating_an_author()
     {
         $user = factory(User::class)->create();
         Passport::actingAs($user);
@@ -230,6 +244,9 @@ class AuthorsTest extends TestCase
             'data' => [
                 'type' => 'authors',
             ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
         ])
             ->assertStatus(422)
             ->assertJson([
@@ -266,6 +283,9 @@ class AuthorsTest extends TestCase
                 'type' => 'authors',
                 'attributes' => 'not an object',
             ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
         ])->assertStatus(422)
             ->assertJson([
                 'errors' => [
@@ -305,6 +325,9 @@ class AuthorsTest extends TestCase
                     'other_name' => 'Jonny',
                 ],
             ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
         ])
             ->assertStatus(422)
             ->assertJson([
@@ -345,6 +368,9 @@ class AuthorsTest extends TestCase
                     'other_name' => 'Jonny',
                 ],
             ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
         ])
             ->assertStatus(422)
             ->assertJson([
@@ -385,6 +411,9 @@ class AuthorsTest extends TestCase
                     'other_name' => 'Jonny',
                 ],
             ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
         ])
             ->assertStatus(422)
             ->assertJson([
@@ -424,6 +453,9 @@ class AuthorsTest extends TestCase
                     'other_name' => '',
                 ],
             ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
         ])
             ->assertStatus(422)
             ->assertJson([
@@ -466,6 +498,9 @@ class AuthorsTest extends TestCase
                     'first_name' => 'Jane',
                 ]
             ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
         ])
             ->assertStatus(200)
             ->assertJson([
@@ -507,6 +542,9 @@ class AuthorsTest extends TestCase
                     'first_name' => 'Jane',
                 ]
             ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
         ])
             ->assertStatus(422)
             ->assertJson([
@@ -544,6 +582,9 @@ class AuthorsTest extends TestCase
                     'first_name' => 'Jane',
                 ]
             ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
         ])
             ->assertStatus(422)
             ->assertJson([
@@ -581,6 +622,9 @@ class AuthorsTest extends TestCase
                     'first_name' => 'Jane',
                 ]
             ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
         ])
             ->assertStatus(422)
             ->assertJson([
@@ -605,7 +649,7 @@ class AuthorsTest extends TestCase
      * @test
      */
     public function
-    it_validates_that_the_type_member_has_the_value_of_authors_when_updating_an_()
+    it_validates_that_the_type_member_has_the_value_of_authors_when_updating_an_author()
     {
         $user = factory(User::class)->create();
         Passport::actingAs($user);
@@ -619,6 +663,9 @@ class AuthorsTest extends TestCase
                     'first_name' => 'Jane',
                 ]
             ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
         ])
             ->assertStatus(422)
             ->assertJson([
@@ -655,6 +702,9 @@ class AuthorsTest extends TestCase
                 'type' => 'authors',
                 'attributes' => ''
             ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
         ])
             ->assertStatus(422)
             ->assertJson([
@@ -679,7 +729,7 @@ class AuthorsTest extends TestCase
      * @test
      */
     public function
-    it_validates_that_the_attributes_member_is_an_object_given_when_updating_an_280()
+    it_validates_that_the_attributes_member_is_an_object_given_when_updating_an_author()
     {
         $user = factory(User::class)->create();
         Passport::actingAs($user);
@@ -691,6 +741,9 @@ class AuthorsTest extends TestCase
                 'type' => 'authors',
                 'attributes' => 'not an object',
             ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
         ])
             ->assertStatus(422)
             ->assertJson([
@@ -729,6 +782,9 @@ class AuthorsTest extends TestCase
                     'first_name' => 47,
                 ],
             ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
         ])
             ->assertStatus(422)
             ->assertJson([
@@ -767,6 +823,9 @@ class AuthorsTest extends TestCase
                     'last_name' => 47,
                 ],
             ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
         ])
             ->assertStatus(422)
             ->assertJson([
@@ -780,7 +839,7 @@ class AuthorsTest extends TestCase
                     ]
                 ]
             ]);
-            
+
         $this->assertDatabaseHas('authors', [
             'id' => 1,
             'last_name' => $author->last_name,
@@ -797,15 +856,22 @@ class AuthorsTest extends TestCase
         Passport::actingAs($user);
         $author = factory(Author::class)->create();
 
-        $this->patchJson('/api/v1/authors/1', [
-            'data' => [
-                'id' => '1',
-                'type' => 'authors',
-                'attributes' => [
-                    'other_name' => 47,
-                ],
+        $this->patchJson(
+            '/api/v1/authors/1',
+            [
+                'data' => [
+                    'id' => '1',
+                    'type' => 'authors',
+                    'attributes' => [
+                        'other_name' => 47,
+                    ],
+                ]
+            ],
+            [
+                'accept' => 'application/vnd.api+json',
+                'content-type' => 'application/vnd.api+json',
             ]
-        ])
+        )
             ->assertStatus(422)
             ->assertJson([
                 'errors' => [
