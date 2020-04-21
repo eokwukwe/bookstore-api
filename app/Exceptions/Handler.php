@@ -58,7 +58,7 @@ class Handler extends ExceptionHandler
                     'details' => $e->getMessage(),
                 ]
             ]
-        ], $this->isHttpException($e) ? $e->getCode() : 500);
+        ], $this->isHttpException($e) ? $e->getStatusCode() : 500);
     }
 
     /**

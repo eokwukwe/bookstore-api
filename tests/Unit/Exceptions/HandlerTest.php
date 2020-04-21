@@ -13,7 +13,6 @@ class HandlerTest extends TestCase
 {
   /**
    * @test
-   * @watch
    */
   public function
   it_converts_an_exception_into_a_json_api_spec_error_response()
@@ -39,7 +38,6 @@ class HandlerTest extends TestCase
 
   /**
    * @test
-   * @watch
    */
   public function
   it_converts_an_http_exception_into_a_json_api_spec_error_response()
@@ -50,7 +48,7 @@ class HandlerTest extends TestCase
     $request = Request::create('/test', 'GET');
     $request->headers->set('accept', 'application/vnd.api+json');
 
-    $exception = new HttpException(404, 'Not found');
+    $exception = new HttpException(404, 'Not found', null, [], 404);
     $response = $handler->render($request, $exception);
 
     TestResponse::fromBaseResponse($response)->assertJson([
@@ -65,7 +63,6 @@ class HandlerTest extends TestCase
 
   /**
    * @test
-   * @watch
    */
   public function it_converts_an_unauthenticated_exception_into_a_json_api_spec_error_response()
   {
