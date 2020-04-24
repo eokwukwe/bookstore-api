@@ -920,6 +920,10 @@ class AuthorsTest extends TestCase
     // public function
     // it_can_sort_authors_by_name_through_a_sort_query_parameter()
     // {
+
+    //     $user = factory(User::class)->create();
+    //     Passport::actingAs($user);
+
     //     $authors = collect([
     //         'Bertram',
     //         'Claus',
@@ -927,13 +931,8 @@ class AuthorsTest extends TestCase
     //     ])->map(function ($name) {
     //         return factory(Author::class)->create([
     //             'first_name' => $name,
-    //             'last_name' => 'Doe',
-    //             'other_name' => 'person'
     //         ]);
     //     });
-
-    //     $user = factory(User::class)->create();
-    //     Passport::actingAs($user);
 
     //     $this->get('/api/v1/authors?sort=first_name', [
     //         'accept' => 'application/vnd.api+json',
@@ -945,8 +944,8 @@ class AuthorsTest extends TestCase
     //                 "type" => "authors",
     //                 "attributes" => [
     //                     'first_name' => 'Anna',
-    //                     // 'last_name' => 'Doe',
-    //                     // 'other_name' => 'person',
+    //                     'last_name' => $authors[2]->last_name,
+    //                     'other_name' => $authors[2]->other_name,
     //                     'created_at' => $authors[2]->created_at->toJSON(),
     //                     'updated_at' => $authors[2]->updated_at->toJSON(),
     //                 ]
@@ -956,48 +955,6 @@ class AuthorsTest extends TestCase
     //                 "type" => "authors",
     //                 "attributes" => [
     //                     'name' => 'Bertram',
-    //                     // 'last_name' => 'Doe',
-    //                     // 'other_name' => 'person',
-    //                     'created_at' => $authors[0]->created_at->toJSON(),
-    //                     'updated_at' => $authors[0]->updated_at->toJSON(),
-    //                 ]
-    //             ],
-    //             [
-    //                 "id" => '2',
-    //                 "type" => "authors",
-    //                 "attributes" => [
-    //                     'first_name' => 'Claus',
-    //                     'last_name' => 'Doe',
-    //                     'other_name' => 'person',
-    //                     'created_at' => $authors[1]->created_at->toJSON(),
-    //                     'updated_at' => $authors[1]->updated_at->toJSON(),
-    //                 ]
-    //             ],
-    //         ]
-    //     ]);
-    // }
-
-    /**
-     * @test
-     * @watch
-     */
-    // public function
-    // it_can_paginate_authors_through_a_page_query_parameter()
-    // {
-    //     $user = factory(User::class)->create();
-    //     Passport::actingAs($user);
-    //     $authors = factory(Author::class, 10)->create();
-
-    //     $this->get('/api/v1/authors?page[size]=5&page[number]=1', [
-    //         'accept' => 'application/vnd.api+json',
-    //         'content-type' => 'application/vnd.api+json',
-    //     ])->assertStatus(200)->assertJson([
-    //         "data" => [
-    //             [
-    //                 "id" => '1',
-    //                 "type" => "authors",
-    //                 "attributes" => [
-    //                     'first_name' => $authors[0]->first_name,
     //                     'last_name' => $authors[0]->last_name,
     //                     'other_name' => $authors[0]->other_name,
     //                     'created_at' => $authors[0]->created_at->toJSON(),
@@ -1008,59 +965,100 @@ class AuthorsTest extends TestCase
     //                 "id" => '2',
     //                 "type" => "authors",
     //                 "attributes" => [
-    //                     'first_name' => $authors[1]->first_name,
+    //                     'first_name' => 'Claus',
     //                     'last_name' => $authors[1]->last_name,
     //                     'other_name' => $authors[1]->other_name,
     //                     'created_at' => $authors[1]->created_at->toJSON(),
     //                     'updated_at' => $authors[1]->updated_at->toJSON(),
     //                 ]
     //             ],
-    //             [
-    //                 "id" => '3',
-    //                 "type" => "authors",
-    //                 "attributes" => [
-    //                     'first_name' => $authors[2]->first_name,
-    //                     'last_name' => $authors[2]->last_name,
-    //                     'other_name' => $authors[2]->other_name,
-    //                     'created_at' => $authors[2]->created_at->toJSON(),
-    //                     'updated_at' => $authors[2]->updated_at->toJSON(),
-    //                 ]
-    //             ],
-    //             [
-    //                 "id" => '4',
-    //                 "type" => "authors",
-    //                 "attributes" => [
-    //                     'first_name' => $authors[3]->first_name,
-    //                     'last_name' => $authors[3]->last_name,
-    //                     'other_name' => $authors[3]->other_name,
-    //                     'created_at' => $authors[3]->created_at->toJSON(),
-    //                     'updated_at' => $authors[3]->updated_at->toJSON(),
-    //                 ]
-    //             ],
-    //             [
-    //                 "id" => '5',
-    //                 "type" => "authors",
-    //                 "attributes" => [
-    //                     'first_name' => $authors[4]->first_name,
-    //                     'last_name' => $authors[4]->last_name,
-    //                     'other_name' => $authors[4]->other_name,
-    //                     'created_at' => $authors[4]->created_at->toJSON(),
-    //                     'updated_at' => $authors[4]->updated_at->toJSON(),
-    //                 ]
-    //             ],
-    //         ],
-    //         'links' => [
-    //             'first' => route('authors.index', [
-    //                 'page[size]' => 5, 'page[number]' => 1
-    //             ]),
-    //             'last' => route('authors.index', [
-    //                 'page[size]' => 5, 'page[number]' => 2
-    //             ]),
-    //             'prev' => null,
-    //             'next' => route('authors.index', [
-    //                 'page[size]' => 5, 'page[number]' => 2
-    //             ]),
     //         ]
     //     ]);
     // }
+
+    /**
+     * @test
+     */
+    public function
+    it_can_paginate_authors_through_a_page_query_parameter()
+    {
+        $user = factory(User::class)->create();
+        Passport::actingAs($user);
+        $authors = factory(Author::class, 10)->create();
+
+        $this->get('/api/v1/authors?page[size]=5&page[number]=1', [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
+        ])->assertStatus(200)->assertJson([
+            "data" => [
+                [
+                    "id" => '1',
+                    "type" => "authors",
+                    "attributes" => [
+                        'first_name' => $authors[0]->first_name,
+                        'last_name' => $authors[0]->last_name,
+                        'other_name' => $authors[0]->other_name,
+                        'created_at' => $authors[0]->created_at->toJSON(),
+                        'updated_at' => $authors[0]->updated_at->toJSON(),
+                    ]
+                ],
+                [
+                    "id" => '2',
+                    "type" => "authors",
+                    "attributes" => [
+                        'first_name' => $authors[1]->first_name,
+                        'last_name' => $authors[1]->last_name,
+                        'other_name' => $authors[1]->other_name,
+                        'created_at' => $authors[1]->created_at->toJSON(),
+                        'updated_at' => $authors[1]->updated_at->toJSON(),
+                    ]
+                ],
+                [
+                    "id" => '3',
+                    "type" => "authors",
+                    "attributes" => [
+                        'first_name' => $authors[2]->first_name,
+                        'last_name' => $authors[2]->last_name,
+                        'other_name' => $authors[2]->other_name,
+                        'created_at' => $authors[2]->created_at->toJSON(),
+                        'updated_at' => $authors[2]->updated_at->toJSON(),
+                    ]
+                ],
+                [
+                    "id" => '4',
+                    "type" => "authors",
+                    "attributes" => [
+                        'first_name' => $authors[3]->first_name,
+                        'last_name' => $authors[3]->last_name,
+                        'other_name' => $authors[3]->other_name,
+                        'created_at' => $authors[3]->created_at->toJSON(),
+                        'updated_at' => $authors[3]->updated_at->toJSON(),
+                    ]
+                ],
+                [
+                    "id" => '5',
+                    "type" => "authors",
+                    "attributes" => [
+                        'first_name' => $authors[4]->first_name,
+                        'last_name' => $authors[4]->last_name,
+                        'other_name' => $authors[4]->other_name,
+                        'created_at' => $authors[4]->created_at->toJSON(),
+                        'updated_at' => $authors[4]->updated_at->toJSON(),
+                    ]
+                ],
+            ],
+            'links' => [
+                'first' => route('authors.index', [
+                    'page[size]' => 5, 'page[number]' => 1
+                ]),
+                'last' => route('authors.index', [
+                    'page[size]' => 5, 'page[number]' => 2
+                ]),
+                'prev' => null,
+                'next' => route('authors.index', [
+                    'page[size]' => 5, 'page[number]' => 2
+                ]),
+            ]
+        ]);
+    }
 }

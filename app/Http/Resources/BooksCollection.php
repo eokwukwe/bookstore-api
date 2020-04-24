@@ -4,10 +4,9 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class AuthorsCollection extends ResourceCollection
+class BooksCollection extends ResourceCollection
 {
-
-    public $collects = AuthorsResource::class;
+    public $collects = BooksResource::class;
 
     /**
      * Transform the resource collection into an array.
