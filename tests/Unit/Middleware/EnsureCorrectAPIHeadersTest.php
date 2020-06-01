@@ -2,10 +2,10 @@
 
 namespace Tests\Unit\Middleware;
 
-use App\Http\Middleware\EnsureCorrectAPIHeaders;
+use Tests\TestCase;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Tests\TestCase;
+use App\Http\Middleware\EnsureCorrectAPIHeaders;
 
 class EnsureCorrectAPIHeadersTest extends TestCase
 {

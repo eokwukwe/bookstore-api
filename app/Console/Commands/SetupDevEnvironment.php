@@ -19,7 +19,7 @@ class SetupDevEnvironment extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Setup up development environment';
 
     /**
      * Create a new command instance.

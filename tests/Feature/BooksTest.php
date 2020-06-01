@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
-use App\User;
 use App\Book;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Laravel\Passport\Passport;
+use App\User;
 use Tests\TestCase;
+use Laravel\Passport\Passport;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 
 class BooksTest extends TestCase
 {

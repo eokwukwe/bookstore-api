@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
-use App\Author;
 use App\User;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Laravel\Passport\Passport;
+use App\Author;
 use Tests\TestCase;
+use Laravel\Passport\Passport;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 
 class AuthorsTest extends TestCase
 {
