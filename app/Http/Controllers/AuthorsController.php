@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Author;
+use Spatie\QueryBuilder\QueryBuilder;
+use App\Http\Resources\AuthorsResource;
+use App\Http\Resources\AuthorsCollection;
 use App\Http\Requests\CreateAuthorRequest;
 use App\Http\Requests\UpdateAuthorRequest;
-use App\Http\Resources\AuthorsCollection;
-use App\Http\Resources\AuthorsResource;
-use Spatie\QueryBuilder\QueryBuilder;
 
 class AuthorsController extends Controller
 {

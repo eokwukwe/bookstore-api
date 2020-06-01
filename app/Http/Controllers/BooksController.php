@@ -3,12 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Book;
-use App\Http\Requests\CreateBookRequest;
-use App\Http\Requests\UpdateBookRequest;
-use App\Http\Resources\BooksCollection;
 use App\Http\Resources\BooksResource;
-use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
+use App\Http\Resources\BooksCollection;
+use App\Http\Requests\UpdateBookRequest;
+use App\Http\Requests\CreateBookRequest;
 
 class BooksController extends Controller
 {
@@ -25,7 +24,9 @@ class BooksController extends Controller
                 'publication_year',
                 'created_at',
                 'updated_at'
-            ])->jsonPaginate();
+            ])
+            ->allowedIncludes('authors')
+            ->jsonPaginate();
 
         return new BooksCollection($books);
     }
@@ -59,9 +60,14 @@ class BooksController extends Controller
      * @param  \App\Book  $book
      * @return \Illuminate\Http\Response
      */
-    public function show(Book $book)
+    public function show($book)
     {
-        return new BooksResource($book);
+
+        $query = QueryBuilder::for(Book::where('id', $book))
+            ->allowedIncludes('authors')
+            ->firstOrFail();
+
+        return new BooksResource($query);
     }
 
     /**
