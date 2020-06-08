@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Book;
-use App\Http\Resources\BooksResource;
 use Spatie\QueryBuilder\QueryBuilder;
-use App\Http\Resources\BooksCollection;
+use App\Http\Resources\JSONAPIResource;
 use App\Http\Requests\UpdateBookRequest;
 use App\Http\Requests\CreateBookRequest;
+use App\Http\Resources\JSONAPICollection;
 
 class BooksController extends Controller
 {
@@ -28,7 +28,7 @@ class BooksController extends Controller
             ->allowedIncludes('authors')
             ->jsonPaginate();
 
-        return new BooksCollection($books);
+        return new JSONAPICollection($books);
     }
 
     /**
@@ -47,7 +47,7 @@ class BooksController extends Controller
             ),
         ]);
 
-        return (new BooksResource($book))
+        return (new JSONAPIResource($book))
             ->response()
             ->header('Location', route('books.show', [
                 'book' => $book,
@@ -67,7 +67,7 @@ class BooksController extends Controller
             ->allowedIncludes('authors')
             ->firstOrFail();
 
-        return new BooksResource($query);
+        return new JSONAPIResource($query);
     }
 
     /**
@@ -80,7 +80,7 @@ class BooksController extends Controller
     public function update(UpdateBookRequest $request, Book $book)
     {
         $book->update($request->input('data.attributes'));
-        return new BooksResource($book);
+        return new JSONAPIResource($book);
     }
 
     /**

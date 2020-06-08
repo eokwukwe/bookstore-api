@@ -5,9 +5,10 @@ namespace App\Http\Resources;
 use Illuminate\Http\Resources\MissingValue;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class BooksCollection extends ResourceCollection
+class JSONAPICollection extends ResourceCollection
 {
-    public $collects = BooksResource::class;
+
+    public $collects = JSONAPIResource::class;
 
     /**
      * Transform the resource collection into an array.
@@ -26,7 +27,7 @@ class BooksCollection extends ResourceCollection
     private function mergeIncludedRelations($request)
     {
         $includes = $this->collection->flatMap->included($request)->unique()->values();
-        
-        return $includes->isNotEmpty() ? $includes : new MissingValue();
+        return $includes->isNotEmpty() ? $includes : new
+            MissingValue();
     }
 }

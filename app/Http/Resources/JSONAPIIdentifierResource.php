@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class AuthorsIdentifierResource extends JsonResource
+class JSONAPIIdentifierResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,7 +16,7 @@ class AuthorsIdentifierResource extends JsonResource
     {
         return [
             'id' => (string) $this->id,
-            'type' => 'authors',
+            'type' => $this->type(),
         ];
     }
 }
