@@ -22,12 +22,4 @@ class Book extends AbstractAPIModel
     {
         return 'books';
     }
-
-    /**
-     * @return string
-     */
-    public function routeParam()
-    {
-        return 'book';
-    }
 }

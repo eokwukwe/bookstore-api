@@ -22,12 +22,4 @@ class Author extends AbstractAPIModel
     {
         return 'authors';
     }
-
-    /**
-     * @return string
-     */
-    public function routeParam()
-    {
-        return 'author';
-    }
 }

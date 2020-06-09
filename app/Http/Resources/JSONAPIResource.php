@@ -2,8 +2,9 @@
 
 namespace App\Http\Resources;
 
-use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Str;
 use Illuminate\Http\Resources\MissingValue;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class JSONAPIResource extends JsonResource
 {
@@ -63,11 +64,11 @@ class JSONAPIResource extends JsonResource
             'links' => [
               'self' => route(
                 "{$this->type()}.relationships.{$relatedType}",
-                ["{$this->routeParam()}" => $this->id]
+                [Str::singular($this->type()) => $this->id]
               ),
               'related' => route(
                 "{$this->type()}.{$relatedType}",
-                ["{$this->routeParam()}" => $this->id]
+                [Str::singular($this->type()) => $this->id]
               ),
             ],
             'data' => !$this->whenLoaded($relationship)

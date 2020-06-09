@@ -11,11 +11,6 @@ abstract class AbstractAPIModel extends Model
      */
     abstract public function type();
 
-    /**
-     * @return string
-     */
-    abstract public function routeParam();
-
     public function allowedAttributes()
     {
         return collect($this->attributes)->filter(function (

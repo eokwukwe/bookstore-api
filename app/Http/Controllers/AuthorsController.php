@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Author;
+use App\Services\JSONAPIService;
 use Spatie\QueryBuilder\QueryBuilder;
 use App\Http\Resources\JSONAPIResource;
 use App\Http\Resources\JSONAPICollection;
@@ -11,6 +12,13 @@ use App\Http\Requests\UpdateAuthorRequest;
 
 class AuthorsController extends Controller
 {
+    private $service;
+
+    public function __construct(JSONAPIService $service)
+    {
+        $this->service = $service;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -18,11 +26,7 @@ class AuthorsController extends Controller
      */
     public function index()
     {
-        $authors = QueryBuilder::for(Author::class)
-            ->allowedSorts(['first_name', 'created_at', 'updated_at'])
-            ->jsonPaginate();
-
-        return new JSONAPICollection($authors);
+        return $this->service->fetchResources(Author::class, 'authors');
     }
 
     /**
@@ -33,14 +37,8 @@ class AuthorsController extends Controller
      */
     public function store(CreateAuthorRequest $request)
     {
-        $author = Author::create([
-            'first_name' => $request->input('data.attributes.first_name'),
-            'last_name' => $request->input('data.attributes.last_name'),
-            'other_name' => $request->input('data.attributes.other_name'),
-        ]);
-        return (new JSONAPIResource($author))
-            ->response()
-            ->header('Location', route('authors.show', ['author' => $author]));
+        return $this->service
+            ->createResource(Author::class, $request->input('data.attributes'));
     }
 
     /**
@@ -51,7 +49,7 @@ class AuthorsController extends Controller
      */
     public function show(Author $author)
     {
-        return new JSONAPIResource($author);
+        return $this->service->fetchResource($author);
     }
 
     /**
@@ -63,8 +61,8 @@ class AuthorsController extends Controller
      */
     public function update(UpdateAuthorRequest $request, Author $author)
     {
-        $author->update($request->input('data.attributes'));
-        return new JSONAPIResource($author);
+        return $this->service
+            ->updateResource($author, $request->input('data.attributes'));
     }
 
     /**
@@ -75,7 +73,6 @@ class AuthorsController extends Controller
      */
     public function destroy(Author $author)
     {
-        $author->delete();
-        return response(null, 204);
+        return $this->service->deleteResource($author);
     }
 }
