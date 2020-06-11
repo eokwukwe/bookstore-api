@@ -2,9 +2,10 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreateBookRequest extends FormRequest
+class JSONAPIRelationshipRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,12 +25,12 @@ class CreateBookRequest extends FormRequest
     public function rules()
     {
         return [
-            'data' => 'required|array',
-            'data.type' => 'required|in:books',
-            'data.attributes' => 'required|array',
-            'data.attributes.title' => 'required|string',
-            'data.attributes.description' => 'required|string',
-            'data.attributes.publication_year' => 'required|string',
+            'data' => 'present|array',
+            'data.*.id' => 'required|string',
+            'data.*.type' => [
+                'required',
+                Rule::in(array_keys(config('jsonapi.resources')))
+            ],
         ];
     }
 }

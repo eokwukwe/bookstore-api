@@ -3,23 +3,33 @@
 namespace App\Http\Controllers;
 
 use App\Book;
-use App\Http\Resources\JSONAPIIdentifierResource;
+use App\Services\JSONAPIService;
 use App\Http\Requests\BooksAuthorsRelationshipsRequest;
+use App\Http\Requests\JSONAPIRelationshipRequest;
 
 class BooksAuthorsRelationshipsController extends Controller
 {
+    private $service;
+
+    public function __construct(JSONAPIService $service)
+    {
+        $this->service = $service;
+    }
+
     public function index(Book $book)
     {
-        return JSONAPIIdentifierResource::collection($book->authors);
+        return $this->service->fetchRelationship($book, 'authors');
     }
 
     public function update(
-        BooksAuthorsRelationshipsRequest $request,
+        JSONAPIRelationshipRequest $request,
         Book $book
     ) {
-        $ids = $request->input('data.*.id');
-        $book->authors()->sync($ids);
-
-        return response(null, 204);
+        return $this->service
+            ->updateManyToManyRelationships(
+                $book,
+                'authors',
+                $request->input('data.*.id')
+            );
     }
 }

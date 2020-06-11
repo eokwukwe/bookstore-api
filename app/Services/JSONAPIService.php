@@ -4,20 +4,32 @@ namespace App\Services;
 
 use Illuminate\Support\Str;
 use Spatie\QueryBuilder\QueryBuilder;
+use Illuminate\Database\Eloquent\Model;
 use App\Http\Resources\JSONAPIResource;
 use App\Http\Resources\JSONAPICollection;
+use App\Http\Resources\JSONAPIIdentifierResource;
 
 class JSONAPIService
 {
   /**
    * Fetch the specified resource.
    *
-   * @param  \App\Model  $model
+   * @param  \Illuminate\Database\Eloquent\Model $model
+   * @param integer $id
+   * @param  string $type
    * @return \Illuminate\Http\Response
    */
-  public function fetchResource($model)
+  public function fetchResource($model, $id = 0, $type = '')
   {
-    return new JSONAPIResource($model);
+    if ($model instanceof Model) {
+      return new JSONAPIResource($model);
+    }
+
+    $query = QueryBuilder::for($model::where('id', $id))
+      ->allowedIncludes(config("jsonapi.resources.{$type}.allowedIncludes"))
+      ->firstOrFail();
+
+    return new JSONAPIResource($query);
   }
 
   /**
@@ -30,7 +42,8 @@ class JSONAPIService
   public function fetchResources(string $modelClass, string $type)
   {
     $models = QueryBuilder::for($modelClass)
-      ->allowedSorts(config("jsonapi.resources.{$type}.allowSorts"))
+      ->allowedSorts(config("jsonapi.resources.{$type}.allowedSorts"))
+      ->allowedIncludes(config("jsonapi.resources.{$type}.allowedIncludes"))
       ->jsonPaginate();
 
     return new JSONAPICollection($models);
@@ -57,7 +70,7 @@ class JSONAPIService
   /**
    * Update the specified resource in storage.
    *
-   * @param  \App\Model  $model
+   * @param  \Illuminate\Database\Eloquent\Model $model
    * @param  array $attributes
    * @return Illuminate\Http\Resources\Json\JsonResource
    */
@@ -68,14 +81,55 @@ class JSONAPIService
   }
 
   /**
-   * Update the specified resource in storage.
+   * Delete the specified resource in storage.
    *
-   * @param  \App\Model  $model
+   * @param  \Illuminate\Database\Eloquent\Model $model
    * @return \Illuminate\Http\Response
    */
   public function deleteResource($model)
   {
     $model->delete();
+    return response(null, 204);
+  }
+
+  /**
+   * Fetch the specified resource with related resource in storage.
+   *
+   * @param  \Illuminate\Database\Eloquent\Model $model
+   * @param string $relationship
+   * @return \Illuminate\Http\Response
+   */
+  public function fetchRelationship($model, string $relationship)
+  {
+    return JSONAPIIdentifierResource::collection($model->$relationship);
+  }
+
+  /**
+   * Fetch the specified book resource with related authors.
+   *
+   * @param  \Illuminate\Database\Eloquent\Model $model
+   * @param string $relationship
+   * @return \Illuminate\Http\Response
+   */
+  public function fetchRelated($model, string $relationship)
+  {
+    return new JSONAPICollection($model->$relationship);
+  }
+
+  /**
+   * Update the specified resource with the related resource in storage.
+   *
+   * @param  \Illuminate\Database\Eloquent\Model $model
+   * @param string $relationship
+   * @param array $ids
+   * @return \Illuminate\Http\Response
+   */
+  public function updateManyToManyRelationships(
+    $model,
+    string $relationship,
+    array $ids
+  ) {
+    $model->$relationship()->sync($ids);
     return response(null, 204);
   }
 }

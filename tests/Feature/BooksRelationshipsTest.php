@@ -31,8 +31,6 @@ class BooksRelationshipsTest extends TestCase
             'content-type' => 'application/vnd.api+json',
         ]);
 
-        // $response->dump();
-
         $response->assertStatus(200);
 
         $response->assertJson([
