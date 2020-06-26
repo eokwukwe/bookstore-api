@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Book;
-use App\User;
-use App\Author;
+use App\Models\Book;
+use App\Models\User;
+use App\Models\Author;
 use Tests\TestCase;
 use Laravel\Passport\Passport;
 use Illuminate\Foundation\Testing\DatabaseMigrations;

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Author;
+use App\Models\Author;
 use App\Services\JSONAPIService;
 use App\Http\Requests\JSONAPIRequest;
 

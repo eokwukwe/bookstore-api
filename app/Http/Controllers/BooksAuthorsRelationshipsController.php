@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Book;
+use App\Models\Book;
 use App\Services\JSONAPIService;
-use App\Http\Requests\BooksAuthorsRelationshipsRequest;
 use App\Http\Requests\JSONAPIRelationshipRequest;
 
 class BooksAuthorsRelationshipsController extends Controller

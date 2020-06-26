@@ -6,8 +6,8 @@ use Tests\TestCase;
 use App\Exceptions\Handler;
 use Illuminate\Http\Request;
 use Illuminate\Testing\TestResponse;
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\QueryException;
+use Illuminate\Auth\AuthenticationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class HandlerTest extends TestCase
