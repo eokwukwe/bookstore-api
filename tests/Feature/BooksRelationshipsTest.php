@@ -551,7 +551,6 @@ class BooksRelationshipsTest extends TestCase
 
     /**
      * @test
-     * @watch
      */
     public function
     it_includes_related_resource_objects_for_a_collection_when_an_include_query_param_is_given()
@@ -725,7 +724,6 @@ class BooksRelationshipsTest extends TestCase
 
     /**
      * @test
-     * @watch
      */
     public function it_only_includes_a_related_resource_object_once_for_a_collection()
     {

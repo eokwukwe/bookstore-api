@@ -43,9 +43,9 @@ class AuthorsController extends Controller
      * @param  \App\Author  $author
      * @return \Illuminate\Http\Response
      */
-    public function show(Author $author)
+    public function show($author)
     {
-        return $this->service->fetchResource($author);
+        return $this->service->fetchResource(Author::class, $author, 'authors');
     }
 
     /**

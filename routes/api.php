@@ -19,8 +19,6 @@ Route::middleware('auth:api')->prefix('v1')->group(function () {
         return $request->user();
     });
 
-    // Authors
-    Route::apiResource('authors', 'AuthorsController');
 
     // Books
     Route::apiResource('books', 'BooksController');
@@ -39,4 +37,22 @@ Route::middleware('auth:api')->prefix('v1')->group(function () {
         'books/{book}/relationships/authors',
         'BooksAuthorsRelationshipsController@update'
     )->name('books.relationships.authors');
+
+    // Authors
+    Route::apiResource('authors', 'AuthorsController');
+
+    Route::get(
+        'authors/{author}/books',
+        'AuthorsBooksRelatedController@index'
+    )->name('authors.books');
+
+    Route::get(
+        'authors/{author}/relationships/books',
+        'AuthorsBooksRelationshipsController@index'
+    )->name('authors.relationships.books');
+
+    Route::patch(
+        'authors/{author}/relationships/books',
+        'AuthorsBooksRelationshipsController@update'
+    )->name('authors.relationships.books');
 });

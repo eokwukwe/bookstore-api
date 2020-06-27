@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Book;
+use App\Models\Author;
 use App\Services\JSONAPIService;
 use App\Http\Requests\JSONAPIRelationshipRequest;
 
-class BooksAuthorsRelationshipsController extends Controller
+class AuthorsBooksRelationshipsController extends Controller
 {
     /**
      * @var JSONAPIService
@@ -18,19 +18,19 @@ class BooksAuthorsRelationshipsController extends Controller
         $this->service = $service;
     }
 
-    public function index(Book $book)
+    public function index(Author $author)
     {
-        return $this->service->fetchRelationship($book, 'authors');
+        return $this->service->fetchRelationship($author, 'books');
     }
 
     public function update(
         JSONAPIRelationshipRequest $request,
-        Book $book
+        Author $author
     ) {
         return $this->service
             ->updateManyToManyRelationships(
-                $book,
-                'authors',
+                $author,
+                'books',
                 $request->input('data.*.id')
             );
     }
