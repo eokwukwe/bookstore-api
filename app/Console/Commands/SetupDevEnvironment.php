@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\User;
+use App\Models\User;
 use Illuminate\Console\Command;
 
 class SetupDevEnvironment extends Command
@@ -59,9 +59,7 @@ class SetupDevEnvironment extends Command
         $this->info('Creating John Doe user');
 
         $user = factory(User::class)->create([
-            'username' => 'johndoe',
-            'first_name' => 'John',
-            'last_name' => 'Doe',
+            'name' => 'John Doe',
             'email' => 'john@doe.com',
             'password' => bcrypt('password'),
         ]);

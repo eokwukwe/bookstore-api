@@ -44,6 +44,7 @@ class JSONAPIService
     $models = QueryBuilder::for($modelClass)
       ->allowedSorts(config("jsonapi.resources.{$type}.allowedSorts"))
       ->allowedIncludes(config("jsonapi.resources.{$type}.allowedIncludes"))
+      ->allowedFilters(config("jsonapi.resources.{$type}.allowedFilters"))
       ->jsonPaginate();
 
     return new JSONAPICollection($models);

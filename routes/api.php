@@ -19,6 +19,13 @@ Route::middleware('auth:api')->prefix('v1')->group(function () {
         return $request->user();
     });
 
+    // Users
+    Route::apiResource('users', 'UsersController');
+    
+    Route::get('/users/current', function (Request $request) {
+        return $request->user();
+    });
+
 
     // Books
     Route::apiResource('books', 'BooksController');

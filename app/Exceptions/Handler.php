@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Database\QueryException;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
@@ -52,6 +53,11 @@ class Handler extends ExceptionHandler
     protected function prepareJsonResponse($request, Throwable $e)
     {
         // dd(response()->json($e->getMessage(), ));
+        // if($e instanceof NotFoundHttpException) {
+        //     dd(response()->json($e));
+        // }
+
+
 
         return response()->json([
             'errors' => [
@@ -62,7 +68,7 @@ class Handler extends ExceptionHandler
                     'details' => $e->getMessage(),
                 ]
             ]
-        ], $this->isHttpException($e) ? $e->getCode() : 500);
+        ], $this->isHttpException($e) ? $e->getStatusCode() : 500);
     }
 
     /**
@@ -116,9 +122,21 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
-
         if ($exception instanceof QueryException) {
             $exception = new NotFoundHttpException('Resource not found', null, 404);
+        }
+
+        if ($exception instanceof ModelNotFoundException) {
+            return response()->json([
+                'errors' => [
+                    [
+                        'title' => Str::title(Str::snake(class_basename(
+                            $exception
+                        ), ' ')),
+                        'details' => 'Resource not found',
+                    ]
+                ]
+            ], 404);
         }
 
         return parent::render($request, $exception);

@@ -50,8 +50,8 @@ class AuthorsTest extends TestCase
     it_returns_all_authors_as_a_collection_of_resource_objects()
     {
         $user = factory(User::class)->create();
-        Passport::actingAs($user);
         $authors = factory(Author::class, 3)->create();
+        Passport::actingAs($user);
 
         $this->getJson('/api/v1/authors', [
             'accept' => 'application/vnd.api+json',
@@ -154,6 +154,7 @@ class AuthorsTest extends TestCase
     {
         $user = factory(User::class)->create();
         Passport::actingAs($user);
+
         $this->postJson('/api/v1/authors', [
             'data' => [
                 'type' => '',
@@ -921,6 +922,7 @@ class AuthorsTest extends TestCase
     // it_can_sort_authors_by_name_through_a_sort_query_parameter()
     // {
 
+    //     $this->withoutExceptionHandling();
     //     $user = factory(User::class)->create();
     //     Passport::actingAs($user);
 
@@ -954,7 +956,7 @@ class AuthorsTest extends TestCase
     //                 "id" => '1',
     //                 "type" => "authors",
     //                 "attributes" => [
-    //                     'name' => 'Bertram',
+    //                     'first_name' => 'Bertram',
     //                     'last_name' => $authors[0]->last_name,
     //                     'other_name' => $authors[0]->other_name,
     //                     'created_at' => $authors[0]->created_at->toJSON(),
@@ -962,7 +964,7 @@ class AuthorsTest extends TestCase
     //                 ]
     //             ],
     //             [
-    //                 "id" => '2',
+    //                 "id" => '3',
     //                 "type" => "authors",
     //                 "attributes" => [
     //                     'first_name' => 'Claus',
