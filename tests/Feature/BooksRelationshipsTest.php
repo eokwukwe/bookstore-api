@@ -540,7 +540,7 @@ class BooksRelationshipsTest extends TestCase
         $user = factory(User::class)->create();
         Passport::actingAs($user);
 
-        $this->get('/api/v1/books/1', [
+        $this->get('/api/v1/books/1?include=authors', [
             'accept' => 'application/vnd.api+json',
             'content-type' => 'application/vnd.api+json',
         ])->assertStatus(200)

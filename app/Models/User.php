@@ -60,7 +60,7 @@ class User extends Authenticatable
     {
         return 'users';
     }
-    
+
     public function allowedAttributes()
     {
         return collect($this->attributes)->filter(function (
@@ -73,5 +73,10 @@ class User extends Authenticatable
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
     }
 }

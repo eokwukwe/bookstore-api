@@ -10,7 +10,9 @@ return [
       'allowedFilters' => [
         Spatie\QueryBuilder\AllowedFilter::exact('role'),
       ],
-      'allowedIncludes' => [],
+      'allowedIncludes' => [
+        'comments'
+      ],
       'validationRules' => [
         'create' => [
           'data.attributes.name' => 'required|string',
@@ -23,7 +25,12 @@ return [
           'data.attributes.password' => 'sometimes|required|string',
         ]
       ],
-      'relationships' => []
+      'relationships' => [
+        [
+          'type' => 'comments',
+          'method' => 'comments',
+        ]
+      ]
     ],
     'authors' => [
       'allowedSorts' => [
@@ -83,6 +90,20 @@ return [
           'method' => 'authors',
         ]
       ]
+    ],
+    'comments' => [
+      'allowedSorts' => ['created_at'],
+      'allowedFilters' => [],
+      'allowedIncludes' => [],
+      'validationRules' => [
+        'create' => [
+          'data.attributes.message' => 'required|string',
+        ],
+        'update' => [
+          'data.attributes.message' => 'required|string',
+        ]
+      ],
+      'relationships' => []
     ],
   ]
 ];

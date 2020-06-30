@@ -6,7 +6,6 @@ use App\Models\User;
 use App\Models\Author;
 use Tests\TestCase;
 use Laravel\Passport\Passport;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
 class AuthorsTest extends TestCase
@@ -21,6 +20,7 @@ class AuthorsTest extends TestCase
     {
         $author = factory(Author::class)->create();
         $user = factory(User::class)->create();
+
         Passport::actingAs($user);
 
         $this->getJson('/api/v1/authors/1', [

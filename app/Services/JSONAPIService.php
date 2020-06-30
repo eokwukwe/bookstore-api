@@ -117,8 +117,38 @@ class JSONAPIService
     return new JSONAPICollection($model->$relationship);
   }
 
+
   /**
-   * Update the specified resource with the related resource in storage.
+   * Update the specified resource with one-to-many relationship.
+   *
+   * @param  \Illuminate\Database\Eloquent\Model $model
+   * @param string $relationship
+   * @param array $ids
+   * @return \Illuminate\Http\Response
+   */
+  public function updateToManyRelationships(
+    $model,
+    string $relationship,
+    array $ids
+  ) {
+    $foreignKey = $model->$relationship()->getForeignKeyName();
+    $relatedModel = $model->$relationship()->getRelated();
+
+    $relatedModel->newQuery()->findOrFail($ids);
+
+    $relatedModel->newQuery()->where($foreignKey, $model->id)->update([
+      $foreignKey => null,
+    ]);
+
+    $relatedModel->newQuery()->whereIn('id', $ids)->update([
+      $foreignKey => $model->id,
+    ]);
+
+    return response(null, 204);
+  }
+
+  /**
+   * Update the specified resource with many-to-many relationship.
    *
    * @param  \Illuminate\Database\Eloquent\Model $model
    * @param string $relationship

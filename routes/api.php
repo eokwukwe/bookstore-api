@@ -21,11 +21,24 @@ Route::middleware('auth:api')->prefix('v1')->group(function () {
 
     // Users
     Route::apiResource('users', 'UsersController');
-    
+    Route::get(
+        'users/{user}/relationships/comments',
+        'UsersCommentsRelationshipsController@index'
+    )->name('users.relationships.comments');
+
+    Route::patch(
+        'users/{user}/relationships/comments',
+        'UsersCommentsRelationshipsController@update'
+    )->name('users.relationships.comments');
+
+    Route::get(
+        'users/{user}/comments',
+        'UsersCommentsRelatedController@index'
+    )->name('users.comments');
+
     Route::get('/users/current', function (Request $request) {
         return $request->user();
     });
-
 
     // Books
     Route::apiResource('books', 'BooksController');
@@ -62,4 +75,7 @@ Route::middleware('auth:api')->prefix('v1')->group(function () {
         'authors/{author}/relationships/books',
         'AuthorsBooksRelationshipsController@update'
     )->name('authors.relationships.books');
+
+    // Comments
+    Route::apiResource('comments', 'CommentsController');
 });
