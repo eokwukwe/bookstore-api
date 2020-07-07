@@ -47,9 +47,9 @@ class UsersTest extends TestCase
     {
         $users = factory(User::class, 3)->create();
 
-        // $users = $users->sortBy(function ($item) {
-        //     return $item->id;
-        // })->values();
+        $users = $users->sortBy(function ($item) {
+            return $item->id;
+        })->values();
 
         Passport::actingAs($users->first());
 
@@ -1114,6 +1114,9 @@ class UsersTest extends TestCase
     public function it_can_paginate_users_through_a_page_query_param()
     {
         $users = factory(User::class, 6)->create();
+        $users = $users->sortBy(function ($item) {
+            return $item->id;
+        })->values();
 
         Passport::actingAs($users->first());
 
@@ -1172,6 +1175,9 @@ class UsersTest extends TestCase
     public function it_can_paginate_users_through_a_page_query_param_and_show_different_pages()
     {
         $users = factory(User::class, 6)->create();
+        $users = $users->sortBy(function ($item) {
+            return $item->id;
+        })->values();
 
         Passport::actingAs($users->first());
 
@@ -1283,6 +1289,9 @@ class UsersTest extends TestCase
     public function it_can_filter_users_by_role()
     {
         $users = factory(User::class, 3)->create();
+        $users = $users->sortBy(function ($item) {
+            return $item->id;
+        })->values();
 
         $users->first()->role = 'admin';
         $users->first()->save();
@@ -1331,7 +1340,6 @@ class UsersTest extends TestCase
                 ]
             ]);
     }
-
 
     /**
      * @test

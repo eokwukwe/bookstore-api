@@ -588,7 +588,10 @@ class UsersRelationshipsTest extends TestCase
      */
     public function it_includes_related_resource_objects_for_a_collection_when_an_include_query_param_is_given()
     {
-        $users = factory(User::class, 3)->create();
+
+        $users = factory(User::class, 3)->create()->sortBy(function ($item) {
+            return $item->id;
+        })->values();
 
         $comments = factory(Comment::class, 3)->make();
         $users->first()->comments()->saveMany($comments);
@@ -720,7 +723,9 @@ class UsersRelationshipsTest extends TestCase
      */
     public function it_only_includes_a_related_resource_object_once_for_a_collection()
     {
-        $users = factory(User::class, 3)->create();
+        $users = factory(User::class, 3)->create()->sortBy(function ($item) {
+            return $item->id;
+        })->values();
 
         $comments = factory(Comment::class, 9)->make();
 
