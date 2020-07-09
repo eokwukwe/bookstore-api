@@ -2,10 +2,11 @@
 
 namespace Tests\Feature;
 
+use Tests\TestCase;
 use App\Models\Book;
 use App\Models\User;
 use App\Models\Author;
-use Tests\TestCase;
+use App\Models\Comment;
 use Laravel\Passport\Passport;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
@@ -68,6 +69,56 @@ class BooksRelationshipsTest extends TestCase
     /**
      * @test
      */
+    public function it_returns_a_relationship_to_comments_adhering_to_json_api_spec()
+    {
+        $book = factory(Book::class)->create();
+        $comments = factory(Comment::class, 3)->make();
+        $book->comments()->saveMany($comments);
+
+        $user = factory(User::class)->create();
+        Passport::actingAs($user);
+
+
+        $this->getJson('/api/v1/books/1?include=comments', [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
+        ])
+            ->assertStatus(200)
+            ->assertJson([
+                'data' => [
+                    'id' => '1',
+                    'type' => 'books',
+                    'relationships' => [
+                        'comments' => [
+                            'links' => [
+                                'self' => route(
+                                    'books.relationships.comments',
+                                    ['book' => $book->id]
+                                ),
+                                'related' => route(
+                                    'books.comments',
+                                    ['book' => $book->id]
+                                ),
+                            ],
+                            'data' => [
+                                [
+                                    'id' => $comments->get(0)->id,
+                                    'type' => 'comments'
+                                ],
+                                [
+                                    'id' => $comments->get(1)->id,
+                                    'type' => 'comments'
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]);
+    }
+
+    /**
+     * @test
+     */
     public function
     a_relationship_link_to_authors_returns_all_related_authors_as_resource_id_objects()
     {
@@ -96,6 +147,42 @@ class BooksRelationshipsTest extends TestCase
                     [
                         'id' => '3',
                         'type' => 'authors',
+                    ],
+                ]
+            ]);
+    }
+
+    /**
+     * @test
+     */
+    public function
+    a_relationship_link_to_comments_returns_all_related_comments_as_resource_id_objects()
+    {
+        $book = factory(Book::class)->create();
+        $comments = factory(Comment::class, 3)->make();
+        $book->comments()->saveMany($comments);
+
+        $user = factory(User::class)->create();
+        Passport::actingAs($user);
+
+        $this->getJson('/api/v1/books/1/relationships/comments', [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
+        ])
+            ->assertStatus(200)
+            ->assertJson([
+                'data' => [
+                    [
+                        'id' => '1',
+                        'type' => 'comments',
+                    ],
+                    [
+                        'id' => '2',
+                        'type' => 'comments',
+                    ],
+                    [
+                        'id' => '3',
+                        'type' => 'comments',
                     ],
                 ]
             ]);
@@ -133,6 +220,43 @@ class BooksRelationshipsTest extends TestCase
             'book_id' => 1,
         ])->assertDatabaseHas('author_book', [
             'author_id' => 6,
+            'book_id' => 1,
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_modify_relationships_to_comments_and_add_new_relationships()
+    {
+        $book = factory(Book::class)->create();
+        $comments = factory(Comment::class, 10)->make();
+        $book->comments()->saveMany($comments);
+
+        $user = factory(User::class)->create();
+        Passport::actingAs($user);
+
+        $this->patchJson('/api/v1/books/1/relationships/comments', [
+            'data' => [
+                [
+                    'id' => '5',
+                    'type' => 'comments',
+                ],
+                [
+                    'id' => '6',
+                    'type' => 'comments',
+                ]
+            ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
+        ])->assertStatus(204);
+
+        $this->assertDatabaseHas('comments', [
+            'id' => 5,
+            'book_id' => 1,
+        ])->assertDatabaseHas('comments', [
+            'id' => 6,
             'book_id' => 1,
         ]);
     }
@@ -191,6 +315,56 @@ class BooksRelationshipsTest extends TestCase
     /**
      * @test
      */
+    public function it_can_modify_relationships_to_comments_and_remove_relationships()
+    {
+        $book = factory(Book::class)->create();
+        $comments = factory(Comment::class, 5)->make();
+        $book->comments()->saveMany($comments);
+
+        $user = factory(User::class)->create();
+        Passport::actingAs($user);
+
+        $this->patchJson('/api/v1/books/1/relationships/comments', [
+            'data' => [
+                [
+                    'id' => '1',
+                    'type' => 'comments',
+                ],
+                [
+                    'id' => '2',
+                    'type' => 'comments',
+                ],
+                [
+                    'id' => '5',
+                    'type' => 'comments',
+                ],
+            ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
+        ])->assertStatus(204);
+
+        $this->assertDatabaseHas('comments', [
+            'id' => 1,
+            'book_id' => 1,
+        ])->assertDatabaseHas('comments', [
+            'id' => 2,
+            'book_id' => 1,
+        ])->assertDatabaseHas('comments', [
+            'id' => 5,
+            'book_id' => 1,
+        ])->assertDatabaseMissing('comments', [
+            'id' => 3,
+            'book_id' => 1,
+        ])->assertDatabaseMissing('comments', [
+            'id' => 4,
+            'book_id' => 1,
+        ]);
+    }
+
+    /**
+     * @test
+     */
     public function it_can_remove_all_relationships_to_authors_with_an_empty_collection()
     {
         $book = factory(Book::class)->create();
@@ -215,6 +389,37 @@ class BooksRelationshipsTest extends TestCase
             'book_id' => 1,
         ])->assertDatabaseMissing('author_book', [
             'author_id' => 3,
+            'book_id' => 1,
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_remove_all_relationships_to_comments_with_an_empty_collection()
+    {
+        $book = factory(Book::class)->create();
+        $comments = factory(Comment::class, 5)->make();
+        $book->comments()->saveMany($comments);
+
+        $user = factory(User::class)->create();
+        Passport::actingAs($user);
+
+        $this->patchJson('/api/v1/books/1/relationships/comments', [
+            'data' => []
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
+        ])->assertStatus(204);
+
+        $this->assertDatabaseMissing('comments', [
+            'id' => 1,
+            'book_id' => 1,
+        ])->assertDatabaseMissing('comments', [
+            'id' => 2,
+            'book_id' => 1,
+        ])->assertDatabaseMissing('comments', [
+            'id' => 3,
             'book_id' => 1,
         ]);
     }
@@ -249,6 +454,42 @@ class BooksRelationshipsTest extends TestCase
             'errors' => [
                 [
                     'title' => 'Not Found Http Exception',
+                    'details' => 'Resource not found',
+                ]
+            ]
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function it_returns_a_404_not_found_when_trying_to_add_relationship_to_a_non_existing_comment()
+    {
+        $book = factory(Book::class)->create();
+        $comments = factory(Comment::class, 5)->make();
+        $book->comments()->saveMany($comments);
+
+        $user = factory(User::class)->create();
+        Passport::actingAs($user);
+
+        $this->patchJson('/api/v1/books/1/relationships/comments', [
+            'data' => [
+                [
+                    'id' => '5',
+                    'type' => 'comments',
+                ],
+                [
+                    'id' => '6',
+                    'type' => 'comments',
+                ]
+            ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
+        ])->assertStatus(404)->assertJson([
+            'errors' => [
+                [
+                    'title'   => 'Not Found Http Exception',
                     'details' => 'Resource not found',
                 ]
             ]
@@ -447,6 +688,57 @@ class BooksRelationshipsTest extends TestCase
 
     /**
      * @test
+     * @watch
+     */
+    public function it_can_get_all_related_comments_as_resource_objects_from_related_link()
+    {
+        $book = factory(Book::class)->create();
+        $comments = factory(Comment::class, 5)->make();
+        $book->comments()->saveMany($comments);
+
+        $user = factory(User::class)->create();
+        Passport::actingAs($user);
+
+        $this->getJson('/api/v1/books/1/comments', [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
+        ])
+            ->assertStatus(200)
+            ->assertJson([
+                'data' => [
+                    [
+                        "id" => '1',
+                        "type" => "comments",
+                        "attributes" => [
+                            'message' => $comments[0]->message,
+                            'created_at' => $comments[0]->created_at->toJSON(),
+                            'updated_at' => $comments[0]->updated_at->toJSON(),
+                        ]
+                    ],
+                    [
+                        "id" => '2',
+                        "type" => "comments",
+                        "attributes" => [
+                            'message' => $comments[1]->message,
+                            'created_at' => $comments[1]->created_at->toJSON(),
+                            'updated_at' => $comments[1]->updated_at->toJSON(),
+                        ]
+                    ],
+                    [
+                        "id" => '3',
+                        "type" => "comments",
+                        "attributes" => [
+                            'message' => $comments[2]->message,
+                            'created_at' => $comments[2]->created_at->toJSON(),
+                            'updated_at' => $comments[2]->updated_at->toJSON(),
+                        ]
+                    ],
+                ]
+            ]);
+    }
+
+    /**
+     * @test
      */
     public function
     it_includes_related_resource_objects_when_an_include_query_param_is_given()
@@ -524,6 +816,235 @@ class BooksRelationshipsTest extends TestCase
                             'other_name' => $authors[2]->other_name,
                             'created_at' => $authors[2]->created_at->toJSON(),
                             'updated_at' => $authors[2]->updated_at->toJSON(),
+                        ]
+                    ],
+                ]
+            ]);
+    }
+
+    /**
+     * @test
+     * @watch
+     */
+    public function it_includes_related_resource_objects_for_comments_when_an_include_query_param_to_comments_is_given()
+    {
+        $book = factory(Book::class)->create();
+        $comments = factory(Comment::class, 3)->make();
+        $book->comments()->saveMany($comments);
+
+        $user = factory(User::class)->create();
+        Passport::actingAs($user);
+
+        $this->getJson('/api/v1/books/1?include=comments', [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
+        ])
+            ->assertStatus(200)
+            ->assertJson([
+                'data' => [
+                    'id' => '1',
+                    'type' => 'books',
+                    'relationships' => [
+                        'comments' => [
+                            'links' => [
+                                'self' => route(
+                                    'books.relationships.comments',
+                                    ['book' => $book->id]
+                                ),
+                                'related' => route(
+                                    'books.comments',
+                                    ['book' => $book->id]
+                                ),
+                            ],
+                            'data' => [
+                                [
+                                    'id' => (string) $comments->get(0)->id,
+                                    'type' => 'comments'
+                                ],
+                                [
+                                    'id' => (string) $comments->get(1)->id,
+                                    'type' => 'comments'
+                                ],
+                                [
+                                    'id' => (string) $comments->get(2)->id,
+                                    'type' => 'comments'
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'included' => [
+                    [
+                        "id" => '1',
+                        "type" => "comments",
+                        "attributes" => [
+                            'message' => $comments[0]->message,
+                            'created_at' => $comments[0]->created_at->toJSON(),
+                            'updated_at' => $comments[0]->updated_at->toJSON(),
+                        ]
+                    ],
+                    [
+                        "id" => '2',
+                        "type" => "comments",
+                        "attributes" => [
+                            'message' => $comments[1]->message,
+                            'created_at' => $comments[1]->created_at->toJSON(),
+                            'updated_at' => $comments[1]->updated_at->toJSON(),
+                        ]
+                    ],
+                    [
+                        "id" => '3',
+                        "type" => "comments",
+                        "attributes" => [
+                            'message' => $comments[2]->message,
+                            'created_at' => $comments[2]->created_at->toJSON(),
+                            'updated_at' => $comments[2]->updated_at->toJSON(),
+                        ]
+                    ],
+                ]
+            ]);
+    }
+
+    /**
+     * @test
+     * @watch
+     */
+    public function it_includes_related_resource_objects_for_authors_and_comments_when_an_include_query_param_to_both_is_given()
+    {
+        $book = factory(Book::class)->create();
+
+        $authors = factory(Author::class, 3)->create();
+        $book->authors()->sync($authors->pluck('id'));
+
+        $comments = factory(Comment::class, 3)->make();
+        $book->comments()->saveMany($comments);
+
+        $user = factory(User::class)->create();
+        Passport::actingAs($user);
+
+        $this->getJson('/api/v1/books/1?include=authors,comments', [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
+        ])
+            ->assertStatus(200)
+            ->assertJson([
+                'data' => [
+                    'id' => '1',
+                    'type' => 'books',
+                    'relationships' => [
+                        'authors' => [
+                            'links' => [
+                                'self' => route(
+                                    'books.relationships.authors',
+                                    ['book' => $book->id]
+                                ),
+                                'related' => route(
+                                    'books.authors',
+                                    ['book' => $book->id]
+                                ),
+                            ],
+                            'data' => [
+                                [
+                                    'id' => (string) $authors->get(0)->id,
+                                    'type' => 'authors'
+                                ],
+                                [
+                                    'id' => (string) $authors->get(1)->id,
+                                    'type' => 'authors'
+                                ],
+                                [
+                                    'id' => (string) $authors->get(2)->id,
+                                    'type' => 'authors'
+                                ]
+                            ]
+                        ],
+                        'comments' => [
+                            'links' => [
+                                'self' => route(
+                                    'books.relationships.comments',
+                                    ['book' => $book->id]
+                                ),
+                                'related' => route(
+                                    'books.comments',
+                                    ['book' => $book->id]
+                                ),
+                            ],
+                            'data' => [
+                                [
+                                    'id' => (string) $comments->get(0)->id,
+                                    'type' => 'comments'
+                                ],
+                                [
+                                    'id' => (string) $comments->get(1)->id,
+                                    'type' => 'comments'
+                                ],
+                                [
+                                    'id' => (string) $comments->get(2)->id,
+                                    'type' => 'comments'
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'included' => [
+                    [
+                        "id" => '1',
+                        "type" => "authors",
+                        "attributes" => [
+                            'first_name' => $authors[0]->first_name,
+                            'last_name' => $authors[0]->last_name,
+                            'other_name' => $authors[0]->other_name,
+                            'created_at' => $authors[0]->created_at->toJSON(),
+                            'updated_at' => $authors[0]->updated_at->toJSON(),
+                        ]
+                    ],
+                    [
+                        "id" => '2',
+                        "type" => "authors",
+                        "attributes" => [
+                            'first_name' => $authors[1]->first_name,
+                            'last_name' => $authors[1]->last_name,
+                            'other_name' => $authors[1]->other_name,
+                            'created_at' => $authors[1]->created_at->toJSON(),
+                            'updated_at' => $authors[1]->updated_at->toJSON(),
+                        ]
+                    ],
+                    [
+                        "id" => '3',
+                        "type" => "authors",
+                        "attributes" => [
+                            'first_name' => $authors[2]->first_name,
+                            'last_name' => $authors[2]->last_name,
+                            'other_name' => $authors[2]->other_name,
+                            'created_at' => $authors[2]->created_at->toJSON(),
+                            'updated_at' => $authors[2]->updated_at->toJSON(),
+                        ]
+                    ],
+                    [
+                        "id" => '1',
+                        "type" => "comments",
+                        "attributes" => [
+                            'message' => $comments[0]->message,
+                            'created_at' => $comments[0]->created_at->toJSON(),
+                            'updated_at' => $comments[0]->updated_at->toJSON(),
+                        ]
+                    ],
+                    [
+                        "id" => '2',
+                        "type" => "comments",
+                        "attributes" => [
+                            'message' => $comments[1]->message,
+                            'created_at' => $comments[1]->created_at->toJSON(),
+                            'updated_at' => $comments[1]->updated_at->toJSON(),
+                        ]
+                    ],
+                    [
+                        "id" => '3',
+                        "type" => "comments",
+                        "attributes" => [
+                            'message' => $comments[2]->message,
+                            'created_at' => $comments[2]->created_at->toJSON(),
+                            'updated_at' => $comments[2]->updated_at->toJSON(),
                         ]
                     ],
                 ]

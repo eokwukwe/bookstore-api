@@ -43,6 +43,7 @@ Route::middleware('auth:api')->prefix('v1')->group(function () {
     // Books
     Route::apiResource('books', 'BooksController');
 
+    // Books-Authors relationship
     Route::get(
         'books/{book}/authors',
         'BooksAuthorsRelatedController@index'
@@ -57,6 +58,22 @@ Route::middleware('auth:api')->prefix('v1')->group(function () {
         'books/{book}/relationships/authors',
         'BooksAuthorsRelationshipsController@update'
     )->name('books.relationships.authors');
+
+    // Books-Comments relationship
+    Route::get(
+        'books/{book}/comments',
+        'BooksCommentsRelatedController@index'
+    )->name('books.comments');
+
+    Route::get(
+        'books/{book}/relationships/comments',
+        'BooksCommentsRelationshipsController@index'
+    )->name('books.relationships.comments');
+
+    Route::patch(
+        'books/{book}/relationships/comments',
+        'BooksCommentsRelationshipsController@update'
+    )->name('books.relationships.comments');
 
     // Authors
     Route::apiResource('authors', 'AuthorsController');

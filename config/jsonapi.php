@@ -70,7 +70,8 @@ return [
       ],
       'allowedFilters' => [],
       'allowedIncludes' => [
-        'authors'
+        'authors',
+        'comments'
       ],
       'validationRules' => [
         'create' => [
@@ -88,6 +89,10 @@ return [
         [
           'type' => 'authors',
           'method' => 'authors',
+        ],
+        [
+          'type' => 'comments',
+          'method' => 'comments',
         ]
       ]
     ],
