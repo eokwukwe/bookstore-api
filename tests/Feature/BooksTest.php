@@ -102,7 +102,7 @@ class BooksTest extends TestCase
      */
     public function it_can_create_a_book_from_a_resource_object()
     {
-        $user = factory(User::class)->create();
+        $user = factory(User::class)->state('admin')->create();
         Passport::actingAs($user);
 
         $this->postJson('/api/v1/books', [
@@ -550,7 +550,7 @@ class BooksTest extends TestCase
      */
     public function it_can_update_a_book_from_a_resource_object()
     {
-        $user = factory(User::class)->create();
+        $user = factory(User::class)->state('admin')->create();
         Passport::actingAs($user);
         $book = factory(Book::class)->create();
 
@@ -960,7 +960,7 @@ class BooksTest extends TestCase
      */
     public function it_can_delete_a_book_through_a_delete_request()
     {
-        $user = factory(User::class)->create();
+        $user = factory(User::class)->state('admin')->create();
         Passport::actingAs($user);
         $book = factory(Book::class)->create();
 

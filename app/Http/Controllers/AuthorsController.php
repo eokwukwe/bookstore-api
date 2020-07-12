@@ -33,6 +33,8 @@ class AuthorsController extends Controller
      */
     public function store(JSONAPIRequest $request)
     {
+        $this->authorize('create', Author::class);
+
         return $this->service
             ->createResource(Author::class, $request->input('data.attributes'));
     }
@@ -57,6 +59,8 @@ class AuthorsController extends Controller
      */
     public function update(JSONAPIRequest $request, Author $author)
     {
+        $this->authorize('create', Author::class);
+
         return $this->service
             ->updateResource($author, $request->input('data.attributes'));
     }
@@ -69,6 +73,8 @@ class AuthorsController extends Controller
      */
     public function destroy(Author $author)
     {
+        $this->authorize('create', Author::class);
+
         return $this->service->deleteResource($author);
     }
 }

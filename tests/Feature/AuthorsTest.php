@@ -102,7 +102,7 @@ class AuthorsTest extends TestCase
      */
     public function it_can_create_an_author_from_a_resource_object()
     {
-        $user = factory(User::class)->create();
+        $user = factory(User::class)->state('admin')->create();
         Passport::actingAs($user);
 
         $this->postJson(
@@ -484,8 +484,9 @@ class AuthorsTest extends TestCase
      */
     public function it_can_update_an_author_from_a_resource_object()
     {
-        $user = factory(User::class)->create();
+        $user = factory(User::class)->state('admin')->create();
         Passport::actingAs($user);
+
         $author = factory(Author::class)->create();
 
         $creationTimestamp = now();
@@ -897,8 +898,9 @@ class AuthorsTest extends TestCase
      */
     public function it_can_delete_an_author_through_a_delete_request()
     {
-        $user = factory(User::class)->create();
+        $user = factory(User::class)->state('admin')->create();
         Passport::actingAs($user);
+
         $author = factory(Author::class)->create();
 
         $this->deleteJson('/api/v1/authors/1', [], [

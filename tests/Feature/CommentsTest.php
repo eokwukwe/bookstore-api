@@ -91,7 +91,7 @@ class CommentsTest extends TestCase
   /**
    * @test
    */
-  public function it_can_create_an_comment_from_a_resource_object()
+  public function it_can_create_a_comment_from_a_resource_object()
   {
     $user = factory(User::class)->create();
     Passport::actingAs($user);

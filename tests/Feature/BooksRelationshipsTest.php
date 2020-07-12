@@ -196,7 +196,7 @@ class BooksRelationshipsTest extends TestCase
         $book = factory(Book::class)->create();
         $authors = factory(Author::class, 10)->create();
 
-        $user = factory(User::class)->create();
+        $user = factory(User::class)->state('admin')->create();
         Passport::actingAs($user);
 
         $this->patchJson('/api/v1/books/1/relationships/authors', [
@@ -233,7 +233,7 @@ class BooksRelationshipsTest extends TestCase
         $comments = factory(Comment::class, 10)->make();
         $book->comments()->saveMany($comments);
 
-        $user = factory(User::class)->create();
+        $user = factory(User::class)->state('admin')->create();
         Passport::actingAs($user);
 
         $this->patchJson('/api/v1/books/1/relationships/comments', [
@@ -271,7 +271,7 @@ class BooksRelationshipsTest extends TestCase
         $authors = factory(Author::class, 5)->create();
         $book->authors()->sync($authors->pluck('id'));
 
-        $user = factory(User::class)->create();
+        $user = factory(User::class)->state('admin')->create();
         Passport::actingAs($user);
 
         $this->patchJson('/api/v1/books/1/relationships/authors', [
@@ -321,7 +321,7 @@ class BooksRelationshipsTest extends TestCase
         $comments = factory(Comment::class, 5)->make();
         $book->comments()->saveMany($comments);
 
-        $user = factory(User::class)->create();
+        $user = factory(User::class)->state('admin')->create();
         Passport::actingAs($user);
 
         $this->patchJson('/api/v1/books/1/relationships/comments', [
@@ -371,7 +371,7 @@ class BooksRelationshipsTest extends TestCase
         $authors = factory(Author::class, 3)->create();
         $book->authors()->sync($authors->pluck('id'));
 
-        $user = factory(User::class)->create();
+        $user = factory(User::class)->state('admin')->create();
         Passport::actingAs($user);
 
         $this->patchJson('/api/v1/books/1/relationships/authors', [
@@ -402,7 +402,7 @@ class BooksRelationshipsTest extends TestCase
         $comments = factory(Comment::class, 5)->make();
         $book->comments()->saveMany($comments);
 
-        $user = factory(User::class)->create();
+        $user = factory(User::class)->state('admin')->create();
         Passport::actingAs($user);
 
         $this->patchJson('/api/v1/books/1/relationships/comments', [
@@ -433,7 +433,7 @@ class BooksRelationshipsTest extends TestCase
         $book = factory(Book::class)->create();
         $authors = factory(Author::class, 5)->create();
 
-        $user = factory(User::class)->create();
+        $user = factory(User::class)->state('admin')->create();
         Passport::actingAs($user);
 
         $this->patchJson('/api/v1/books/1/relationships/authors', [
@@ -469,7 +469,7 @@ class BooksRelationshipsTest extends TestCase
         $comments = factory(Comment::class, 5)->make();
         $book->comments()->saveMany($comments);
 
-        $user = factory(User::class)->create();
+        $user = factory(User::class)->state('admin')->create();
         Passport::actingAs($user);
 
         $this->patchJson('/api/v1/books/1/relationships/comments', [
@@ -1523,7 +1523,7 @@ class BooksRelationshipsTest extends TestCase
     public function
     when_creating_a_book_it_can_also_add_relationships_right_away()
     {
-        $user = factory(User::class)->create();
+        $user = factory(User::class)->state('admin')->create();
         Passport::actingAs($user);
 
         $authors = factory(Author::class, 2)->create();
@@ -1665,9 +1665,8 @@ class BooksRelationshipsTest extends TestCase
     public function
     when_updating_a_book_it_can_also_update_relationships()
     {
-        $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = factory(User::class)->state('admin')->create();
         Passport::actingAs($user);
 
         $book = factory(Book::class)->create();

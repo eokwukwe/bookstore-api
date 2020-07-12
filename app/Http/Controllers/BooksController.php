@@ -33,6 +33,8 @@ class BooksController extends Controller
      */
     public function store(JSONAPIRequest $request)
     {
+        $this->authorize('create', Book::class);
+
         return $this->service
             ->createResource(
                 Book::class,
@@ -62,6 +64,8 @@ class BooksController extends Controller
      */
     public function update(JSONAPIRequest $request, Book $book)
     {
+        $this->authorize('update', $book);
+
         return $this->service
             ->updateResource(
                 $book,
@@ -78,6 +82,8 @@ class BooksController extends Controller
      */
     public function destroy(Book $book)
     {
+        $this->authorize('delete', $book);
+
         return $this->service->deleteResource($book);
     }
 }

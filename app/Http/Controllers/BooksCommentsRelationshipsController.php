@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Book;
 use App\Services\JSONAPIService;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\JSONAPIRelationshipRequest;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class BooksCommentsRelationshipsController extends Controller
 {
@@ -28,6 +30,10 @@ class BooksCommentsRelationshipsController extends Controller
         JSONAPIRelationshipRequest $request,
         Book $book
     ) {
+        if (Gate::denies('admin-only')) {
+            throw new AuthorizationException('This action is unauthorized.');
+        }
+
         return $this->service
             ->updateToManyRelationships(
                 $book,
