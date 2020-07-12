@@ -34,7 +34,11 @@ class BooksController extends Controller
     public function store(JSONAPIRequest $request)
     {
         return $this->service
-            ->createResource(Book::class, $request->input('data.attributes'));
+            ->createResource(
+                Book::class,
+                $request->input('data.attributes'),
+                $request->input('data.relationships'),
+            );
     }
 
     /**
@@ -59,7 +63,11 @@ class BooksController extends Controller
     public function update(JSONAPIRequest $request, Book $book)
     {
         return $this->service
-            ->updateResource($book, $request->input('data.attributes'));
+            ->updateResource(
+                $book,
+                $request->input('data.attributes'),
+                $request->input('data.relationships'),
+            );
     }
 
     /**

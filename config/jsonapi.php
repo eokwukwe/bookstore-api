@@ -99,16 +99,28 @@ return [
     'comments' => [
       'allowedSorts' => ['created_at'],
       'allowedFilters' => [],
-      'allowedIncludes' => [],
+      'allowedIncludes' => [
+        'users',
+        'books'
+      ],
       'validationRules' => [
         'create' => [
           'data.attributes.message' => 'required|string',
         ],
         'update' => [
-          'data.attributes.message' => 'required|string',
+          'data.attributes.message' => 'sometimes|required|string',
         ]
       ],
-      'relationships' => []
+      'relationships' => [
+        [
+          'type' => 'books',
+          'method' => 'books',
+        ],
+        [
+          'type' => 'users',
+          'method' => 'users',
+        ],
+      ]
     ],
   ]
 ];

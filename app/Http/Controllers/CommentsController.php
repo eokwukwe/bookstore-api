@@ -39,7 +39,8 @@ class CommentsController extends Controller
     {
         return $this->service->createResource(
             Comment::class,
-            $request->input('data.attributes')
+            $request->input('data.attributes'),
+            $request->input('data.relationships'),
         );
     }
 
@@ -69,7 +70,8 @@ class CommentsController extends Controller
     {
         return $this->service->updateResource(
             $comment,
-            $request->input('data.attributes')
+            $request->input('data.attributes'),
+            $request->input('data.relationships'),
         );
     }
 

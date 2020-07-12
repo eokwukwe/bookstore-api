@@ -688,7 +688,6 @@ class BooksRelationshipsTest extends TestCase
 
     /**
      * @test
-     * @watch
      */
     public function it_can_get_all_related_comments_as_resource_objects_from_related_link()
     {
@@ -824,7 +823,6 @@ class BooksRelationshipsTest extends TestCase
 
     /**
      * @test
-     * @watch
      */
     public function it_includes_related_resource_objects_for_comments_when_an_include_query_param_to_comments_is_given()
     {
@@ -907,7 +905,6 @@ class BooksRelationshipsTest extends TestCase
 
     /**
      * @test
-     * @watch
      */
     public function it_includes_related_resource_objects_for_authors_and_comments_when_an_include_query_param_to_both_is_given()
     {
@@ -1518,5 +1515,293 @@ class BooksRelationshipsTest extends TestCase
                 ],
             ]
         ]);
+    }
+
+    /**
+     * @test
+     */
+    public function
+    when_creating_a_book_it_can_also_add_relationships_right_away()
+    {
+        $user = factory(User::class)->create();
+        Passport::actingAs($user);
+
+        $authors = factory(Author::class, 2)->create();
+
+        $this->postJson('/api/v1/books', [
+            'data' => [
+                'type' => 'books',
+                'attributes' => [
+                    'title' => 'Building an API with Laravel',
+                    'description' => 'A book about API development',
+                    'publication_year' => '2019',
+                ],
+                'relationships' => [
+                    'authors' => [
+                        'data' => [
+                            [
+                                'id' => (string) $authors[0]->id,
+                                'type' => 'authors',
+                            ],
+                            [
+                                'id' => (string) $authors[1]->id,
+                                'type' => 'authors',
+                            ],
+                        ]
+                    ]
+                ]
+            ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
+        ])
+            ->assertStatus(201)
+            ->assertJson([
+                "data" => [
+                    "id" => '1',
+                    "type" => 'books',
+                    "attributes" => [
+                        'title' => 'Building an API with Laravel',
+                        'description' => 'A book about API development',
+                        'publication_year' => '2019',
+                        'created_at' => now()->setMilliseconds(0)->toJSON(),
+                        'updated_at' => now()->setMilliseconds(0)->toJSON(),
+                    ],
+                    'relationships' => [
+                        'authors' => [
+                            'links' => [
+                                'self' => route(
+                                    'books.relationships.authors',
+                                    ['book' => 1]
+                                ),
+                                'related' => route(
+                                    'books.authors',
+                                    ['book' => 1]
+                                ),
+                            ],
+                            'data' => [
+                                [
+                                    'id' => $authors->get(0)->id,
+                                    'type' => 'authors'
+                                ],
+                                [
+                                    'id' => $authors->get(1)->id,
+                                    'type' => 'authors'
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ])->assertHeader('Location', url('/api/v1/books/1'));
+
+        $this->assertDatabaseHas('books', [
+            'id' => 1,
+            'title' => 'Building an API with Laravel',
+        ])->assertDatabaseHas('author_book', [
+            'book_id' => 1,
+            'author_id' => $authors[0]->id,
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function it_validates_relationships_given_when_creating_book()
+    {
+        $user = factory(User::class)->create();
+        Passport::actingAs($user);
+
+        $authors = factory(Author::class, 2)->create();
+
+        $this->postJson('/api/v1/books', [
+            'data' => [
+                'type' => 'books',
+                'attributes' => [
+                    'title' => 'Building an API with Laravel',
+                    'description' => 'A book about API development',
+                    'publication_year' => '2019',
+                ],
+                'relationships' => [
+                    'authors' => [
+                        'data' => [
+                            [
+                                'id' => $authors[1]->id,
+                                'type' => 'authors',
+                            ],
+                            [
+                                'id' => (string) $authors[1]->id,
+                                'type' => 'random',
+                            ],
+                        ]
+                    ]
+                ]
+            ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
+        ])->assertStatus(422)->assertJson([
+            'errors' => [
+                [
+                    'title' => 'Validation Error',
+                    'details' => 'The data.relationships.authors.data.0.id must be a string.',
+                    'source' => [
+                        'pointer' => '/data/relationships/authors/data/0/id',
+                    ]
+                ],
+                [
+                    'title' => 'Validation Error',
+                    'details' => 'The selected data.relationships.authors.data.1.type is invalid.',
+                    'source' => [
+                        'pointer' => '/data/relationships/authors/data/1/type',
+                    ]
+                ],
+            ]
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function
+    when_updating_a_book_it_can_also_update_relationships()
+    {
+        $this->withoutExceptionHandling();
+
+        $user = factory(User::class)->create();
+        Passport::actingAs($user);
+
+        $book = factory(Book::class)->create();
+        $authors = factory(Author::class, 3)->create();
+
+        $book->authors()->sync($authors->pluck('id'));
+
+        $this->patchJson('/api/v1/books/1', [
+            'data' => [
+                'id' => '1',
+                'type' => 'books',
+                'attributes' => [
+                    'title' => 'Building an API with Laravel',
+                    'description' => 'A book about API development',
+                    'publication_year' => '2019',
+                ],
+                'relationships' => [
+                    'authors' => [
+                        'data' => [
+                            [
+                                'id' => (string) $authors[2]->id,
+                                'type' => 'authors',
+                            ],
+                        ]
+                    ]
+                ]
+            ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
+        ])
+            ->assertStatus(200)
+            ->assertJson([
+                "data" => [
+                    "id" => '1',
+                    "type" => 'books',
+                    "attributes" => [
+                        'title' => 'Building an API with Laravel',
+                        'description' => 'A book about API development',
+                        'publication_year' => '2019',
+                        'created_at' => now()->setMilliseconds(0)->toJSON(),
+                        'updated_at' => now()->setMilliseconds(0)->toJSON(),
+                    ],
+                    'relationships' => [
+                        'authors' => [
+                            'links' => [
+                                'self' => route(
+                                    'books.relationships.authors',
+                                    ['book' => 1]
+                                ),
+                                'related' => route(
+                                    'books.authors',
+                                    ['book' => 1]
+                                ),
+                            ],
+                            'data' => [
+                                [
+                                    'id' => $authors->get(2)->id,
+                                    'type' => 'authors'
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]);
+
+        $this->assertDatabaseHas('books', [
+            'id' => 1,
+            'title' => 'Building an API with Laravel',
+        ])->assertDatabaseHas('author_book', [
+            'book_id' => 1,
+            'author_id' => $authors[2]->id,
+        ]);
+    }
+
+    /**
+     * @test
+     */
+    public function
+    it_validates_relationships_given_when_updating_a_book()
+    {
+        $user = factory(User::class)->create();
+        Passport::actingAs($user);
+
+        $book = factory(Book::class)->create();
+        $authors = factory(Author::class, 3)->create();
+
+        $book->authors()->sync($authors->pluck('id'));
+
+        $this->patchJson('/api/v1/books/1', [
+            'data' => [
+                'id' => '1',
+                'type' => 'books',
+                'attributes' => [
+                    'title' => 'Building an API with Laravel',
+                    'description' => 'A book about API development',
+                    'publication_year' => '2019',
+                ],
+                'relationships' => [
+                    'authors' => [
+                        'data' => [
+                            [
+                                'id' => $authors[1]->id,
+                                'type' => 'authors',
+                            ],
+                            [
+                                'id' => (string) $authors[1]->id,
+                                'type' => 'random',
+                            ],
+                        ]
+                    ]
+                ]
+            ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
+        ])
+            ->assertStatus(422)->assertJson([
+                'errors' => [
+                    [
+                        'title' => 'Validation Error',
+                        'details' => 'The data.relationships.authors.data.0.id must be a string.',
+                        'source' => [
+                            'pointer' => '/data/relationships/authors/data/0/id',
+                        ]
+                    ],
+                    [
+                        'title' => 'Validation Error',
+                        'details' => 'The selected data.relationships.authors.data.1.type is invalid.',
+                        'source' => [
+                            'pointer' => '/data/relationships/authors/data/1/type',
+                        ]
+                    ],
+                ]
+            ]);
     }
 }
