@@ -15,9 +15,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth:api')->prefix('v1')->group(function () {
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
+
+
+    Route::get('/users/current', 'CurrentAuthenticatedUserController@show');
 
     // Users
     Route::apiResource('users', 'UsersController');
@@ -35,10 +35,6 @@ Route::middleware('auth:api')->prefix('v1')->group(function () {
         'users/{user}/comments',
         'UsersCommentsRelatedController@index'
     )->name('users.comments');
-
-    Route::get('/users/current', function (Request $request) {
-        return $request->user();
-    });
 
     // Books
     Route::apiResource('books', 'BooksController');

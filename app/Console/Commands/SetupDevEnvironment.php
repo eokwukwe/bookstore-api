@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\User;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Hash;
 
 class SetupDevEnvironment extends Command
 {
@@ -41,9 +42,8 @@ class SetupDevEnvironment extends Command
         $this->info('Setting up development environment');
 
         $this->MigrateAndSeedDatabase();
-        $user = $this->CreateJohnDoeUser();
-        $this->CreatePersonalAccessClient($user);
-        $this->CreatePersonalAccessToken($user);
+
+        $this->createUser('John Doe', 'john@example.com', 'admin');
 
         $this->info('All done. Bye!');
     }
@@ -54,19 +54,24 @@ class SetupDevEnvironment extends Command
         $this->call('db:seed');
     }
 
-    public function CreateJohnDoeUser()
-    {
-        $this->info('Creating John Doe user');
+    public function createUser(
+        $name,
+        $email,
+        $role = 'user',
+        $password
+        = 'secret'
+    ) {
+        $this->info(PHP_EOL);
+        $this->info("Creating {$name} $role");
 
         $user = factory(User::class)->create([
-            'name' => 'John Doe',
-            'email' => 'john@doe.com',
-            'password' => bcrypt('password'),
+            'name' => $name,
+            'email' => $email,
+            'role' => $role,
+            'password' => Hash::make($password),
         ]);
 
-        $this->info('John Doe created');
-        $this->warn('Email: john@doe.com');
-        $this->warn('Password: password');
+        $this->createPersonalAccessClientAndTokenForUser($user);
 
         return $user;
     }
@@ -86,5 +91,21 @@ class SetupDevEnvironment extends Command
         $this->info('Personal access token created successfully.');
         $this->warn("Personal access token:");
         $this->line($token->accessToken);
+    }
+
+    public function createPersonalAccessClientAndTokenForUser(User
+    $user): void
+    {
+        $this->info(PHP_EOL);
+
+        $this->info(
+            "Creating personal access client and token for {$user->name}"
+        );
+
+        $this->CreatePersonalAccessClient($user);
+
+        $this->CreatePersonalAccessToken($user);
+
+        $this->info(PHP_EOL);
     }
 }
